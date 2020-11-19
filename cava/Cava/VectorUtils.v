@@ -29,6 +29,8 @@ Require Export ExtLib.Data.Monads.IdentityMonad.
 
 From Cava Require Import ListUtils.
 
+Require Import Coq.Program.Equality.
+
 Section traversable.
   Universe u v vF.
   Context {F : Type@{v} -> Type@{vF}}.
@@ -130,6 +132,24 @@ Fixpoint vcombine {A B: Type} {s: nat} (a: Vector.t A s)
 
 Local Close Scope vector_scope.
 
+Fixpoint vec_mk {A} n (f : Fin.t n -> A) : Vector.t A n :=
+  match n, f with
+  | 0, f => nil _
+  | S n', f => cons _ (f Fin.F1)  _ (vec_mk n' (fun i => f (Fin.FS i)))
+  end.
+
+Lemma nth_vec_mk {A n} (f : Fin.t n -> A) (i : Fin.t n) :
+  nth (vec_mk n f) i = f i.
+Proof.
+  induction n.
+  - inversion i.
+  - simpl.
+    dependent destruction i;
+      simpl; auto.
+    rewrite IHn.
+    auto.
+Qed.
+
 (* Vector version of seq *)
 
 Fixpoint vseq (start len: nat) : Vector.t nat len :=
@@ -137,6 +157,7 @@ Fixpoint vseq (start len: nat) : Vector.t nat len :=
   | 0 => []
   | S n' => start :: vseq (start + 1) n'
   end%vector.
+
 
 
 (******************************************************************************)
