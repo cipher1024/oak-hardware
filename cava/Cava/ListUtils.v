@@ -130,6 +130,19 @@ End Folds.
 Hint Rewrite @fold_left_cons @fold_left_nil
      using solve [eauto] : push_list_fold.
 
+Section Map2.
+
+
+
+  Fixpoint map2 {A B C} (f : A -> B -> C) (xs : list A) (ys : list B) : list C :=
+    match xs, ys with
+    | [], _  => []
+    | _, [] => []
+    | (x :: xs), (y :: ys) => f x y :: map2 f xs ys
+    end.
+
+End Map2.
+
 (* Defines a version of fold_left that accumulates a list of (a
    projection of) all the states it passed through *)
 Section FoldLeftAccumulate.
